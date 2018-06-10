@@ -54,6 +54,10 @@ class Controller
             $dispatcher = new Routing\Dispatcher($router->getData());
             return $dispatcher->dispatch($method, $uri);
         } catch (\Routing\HttpRouteNotFoundException $e) {
+            $lower_uri = strtolower($uri);
+            if ($uri !== $lower_uri) {
+                return static::execute($method. $lower_uri);
+            }
             return NavActions::execute404();
         } catch (\Routing\HttpMethodNotAllowedException $e) {
             Response::setStatus(405);
@@ -102,13 +106,13 @@ class Controller
 
         $router->any('/dmca', 'ReportActions::executeDmca');
 
-    $router->any('/youtube/sub', 'AcquisitionActions::executeYouTubeSub');
-    $router->post('/youtube/edit', 'AcquisitionActions::executeYoutubeEdit');
-    $router->post('/youtube/token', 'AcquisitionActions::executeYoutubeToken');
-    $router->any('/youtube/status/{token}', 'AcquisitionActions::executeYoutubeStatus');
-    $router->any('/youtube/status', 'AcquisitionActions::executeRedirectYoutube');
-    $router->any('/youtube', 'AcquisitionActions::executeYouTube');
-    $router->get('/youtube/{version}', 'AcquisitionActions::executeYouTube');
+        $router->any('/youtube/sub', 'AcquisitionActions::executeYouTubeSub');
+        $router->post('/youtube/edit', 'AcquisitionActions::executeYoutubeEdit');
+        $router->post('/youtube/token', 'AcquisitionActions::executeYoutubeToken');
+        $router->any('/youtube/status/{token}', 'AcquisitionActions::executeYoutubeStatus');
+        $router->any('/youtube/status', 'AcquisitionActions::executeRedirectYoutube');
+        $router->any('/youtube', 'AcquisitionActions::executeYouTube');
+        $router->get('/youtube/{version}', 'AcquisitionActions::executeYouTube');
 
         $router->get('/verify/{token}', 'AcquisitionActions::executeVerify');
 
@@ -148,6 +152,10 @@ class Controller
                 Response::enableHttpCache();
                 return ['page/' . $slug, []];
             } else {
+                $lower_slug = strtolower($slug);
+                if ($slug !== $lower_slug) {
+                    return static::execute("GET", $lower_slug);
+                }
                 return NavActions::execute404();
             }
         });
